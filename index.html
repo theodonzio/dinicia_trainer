@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DINACIA Trainer</title>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #020617, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,.5);
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .question {
+      font-size: 1.05rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    button.option {
+      background: #020617;
+      border: 1px solid #1f2933;
+      color: var(--text);
+      padding: 0.9rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    button.option:hover {
+      border-color: var(--accent);
+    }
+
+    button.correct {
+      background: rgba(34,197,94,.15);
+      border-color: var(--correct);
+      color: var(--correct);
+    }
+
+    button.wrong {
+      background: rgba(239,68,68,.15);
+      border-color: var(--wrong);
+      color: var(--wrong);
+    }
+
+    .footer {
+      margin-top: 1.2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+    <h1>DINACIA Trainer</h1>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="footer">Preguntas infinitas · Modo estudio</div>
+  </div>
+
+  <script>
+    const questions = [
+
+  // CONCEPTOS BÁSICOS
+  {
+    q: "¿Qué es un RPA?",
+    options: [
+      "Vehículo aéreo no tripulado",
+      "Aeronave no tripulada",
+      "Sistema de aeronave no tripulada",
+      "Aeromodelo recreativo"
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Qué significa UAV?",
+    options: [
+      "Aeronave pilotada a distancia",
+      "Vehículo aéreo no tripulado",
+      "Sistema de control remoto",
+      "Reglas de vuelo visual"
+    ],
+    correct: 1
+  },
+  {
+    q: "El término 'drone' es:",
+    options: [
+      "Un término técnico de OACI",
+      "Un tipo específico de RPA",
+      "Una palabra coloquial para aeronaves no tripuladas",
+      "Un aeromodelo"
+    ],
+    correct: 2
+  },
+  {
+    q: "¿Qué es un aeromodelo?",
+    options: [
+      "Un RPA de uso profesional",
+      "Una aeronave no tripulada militar",
+      "Aeronave de tamaño reducido para vuelos deportivos",
+      "Un UAS autónomo"
+    ],
+    correct: 2
+  },
+
+  // SISTEMAS
+  {
+    q: "¿Qué es un RPAS?",
+    options: [
+      "Solo la aeronave",
+      "Sistema de aeronave pilotada a control remoto",
+      "Sistema autónomo sin piloto",
+      "Vehículo aéreo no tripulado"
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Qué es un UAS?",
+    options: [
+      "Un tipo de RPAS",
+      "Sistema más amplio que RPAS",
+      "Solo la estación de control",
+      "Un aeromodelo"
+    ],
+    correct: 1
+  },
+
+  // REGLAS Y CONDICIONES
+  {
+    q: "VFR significa:",
+    options: [
+      "Reglas de vuelo visual",
+      "Reglas de vuelo por instrumentos",
+      "Condiciones meteorológicas visuales",
+      "Vuelo fuera de reglas"
+    ],
+    correct: 0
+  },
+  {
+    q: "IFR significa:",
+    options: [
+      "Vuelo internacional",
+      "Reglas de vuelo por instrumentos",
+      "Condiciones meteorológicas por instrumentos",
+      "Reglas visuales"
+    ],
+    correct: 1
+  },
+  {
+    q: "VMC corresponde a:",
+    options: [
+      "Reglas de vuelo",
+      "Condiciones meteorológicas visuales",
+      "Vuelo automático",
+      "Instrumentos de navegación"
+    ],
+    correct: 1
+  },
+  {
+    q: "IMC corresponde a:",
+    options: [
+      "Condiciones meteorológicas por instrumentos",
+      "Reglas visuales",
+      "Vuelo manual",
+      "Sistema autónomo"
+    ],
+    correct: 0
+  },
+
+  // PILOTOS Y OPERADORES
+  {
+    q: "¿Qué es un piloto a distancia?",
+    options: [
+      "Propietario del dron",
+      "Persona responsable de la conducción del vuelo del RPA",
+      "Técnico de mantenimiento",
+      "Operador automático"
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Qué es un operador de UAS?",
+    options: [
+      "Piloto remoto",
+      "Controlador aéreo",
+      "Persona física o jurídica propietaria o arrendataria del UAS",
+      "Fabricante del dron"
+    ],
+    correct: 2
+  },
+
+  // DINACIA
+  {
+    q: "DINACIA es:",
+    options: [
+      "Un organismo privado",
+      "Una empresa de drones",
+      "La autoridad de aviación civil en Uruguay",
+      "Una organización internacional"
+    ],
+    correct: 2
+  },
+
+  // CLASIFICACIÓN DE DRONES
+  {
+    q: "Un dron de ala fija se caracteriza por:",
+    options: [
+      "Vuelo estacionario",
+      "Despegue vertical",
+      "Mayor autonomía y menor ruido",
+      "Alta maniobrabilidad"
+    ],
+    correct: 2
+  },
+  {
+    q: "Un multirrotor se caracteriza por:",
+    options: [
+      "Mayor alcance",
+      "Vuelo estacionario",
+      "Menor maniobrabilidad",
+      "Alas fijas"
+    ],
+    correct: 1
+  },
+
+  // PARTES DEL DRONE
+  {
+    q: "¿Cuál es la función del ESC?",
+    options: [
+      "Controlar la cámara",
+      "Controlar la velocidad del motor",
+      "Transmitir video",
+      "Almacenar energía"
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Qué es el payload?",
+    options: [
+      "Sistema de propulsión",
+      "Carga útil",
+      "Control remoto",
+      "Batería"
+    ],
+    correct: 1
+  },
+
+  // MOTORES
+  {
+    q: "Los motores usados en drones son generalmente:",
+    options: [
+      "Brushed",
+      "De combustión",
+      "Brushless",
+      "Hidráulicos"
+    ],
+    correct: 2
+  },
+
+  // HÉLICES Y FÍSICA
+  {
+    q: "¿Qué es el efecto par?",
+    options: [
+      "Diferencia de empuje",
+      "Reacción contraria al giro de la hélice",
+      "Falla del motor",
+      "Error de navegación"
+    ],
+    correct: 1
+  },
+  {
+    q: "El efecto par se compensa mediante:",
+    options: [
+      "Más potencia",
+      "Hélices contrarrotatorias",
+      "Mayor peso",
+      "GPS"
+    ],
+    correct: 1
+  },
+  {
+    q: "La tercera ley de Newton establece que:",
+    options: [
+      "La energía no se crea ni se destruye",
+      "A mayor masa mayor fuerza",
+      "A toda acción corresponde una reacción igual y opuesta",
+      "La fuerza depende de la velocidad"
+    ],
+    correct: 2
+  },
+
+  // BATERÍAS
+  {
+    q: "La batería más utilizada en drones es:",
+    options: [
+      "NiMH",
+      "NiCd",
+      "LiPo",
+      "Plomo"
+    ],
+    correct: 2
+  },
+  {
+    q: "Una desventaja de las baterías LiPo es:",
+    options: [
+      "Efecto memoria",
+      "Bajo peso",
+      "Riesgo de combustión",
+      "Lenta recarga"
+    ],
+    correct: 2
+  },
+
+  // CONTROLADORA DE VUELO
+  {
+    q: "¿Qué mide el acelerómetro?",
+    options: [
+      "Velocidad angular",
+      "Aceleraciones",
+      "Orientación magnética",
+      "Presión"
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Qué mide el giroscopio?",
+    options: [
+      "Presión",
+      "Aceleración",
+      "Velocidad angular",
+      "Altura"
+    ],
+    correct: 2
+  },
+  {
+    q: "¿Para qué sirve el magnetómetro?",
+    options: [
+      "Medir altura",
+      "Orientación respecto al norte magnético",
+      "Velocidad",
+      "Presión atmosférica"
+    ],
+    correct: 1
+  },
+
+  // EJES
+  {
+    q: "El eje longitudinal corresponde a:",
+    options: [
+      "Guiñada",
+      "Cabeceo",
+      "Alabeo",
+      "Empuje"
+    ],
+    correct: 2
+  },
+  {
+    q: "El eje vertical corresponde a:",
+    options: [
+      "Cabeceo",
+      "Alabeo",
+      "Guiñada",
+      "Sustentación"
+    ],
+    correct: 2
+  },
+
+  // FRECUENCIAS
+  {
+    q: "La frecuencia entre control y aeronave es generalmente:",
+    options: [
+      "5.8 GHz",
+      "900 MHz",
+      "2.4 GHz",
+      "1.2 GHz"
+    ],
+    correct: 2
+  },
+  {
+    q: "La frecuencia típica de transmisión de video es:",
+    options: [
+      "2.4 GHz",
+      "5.8 GHz",
+      "433 MHz",
+      "1 GHz"
+    ],
+    correct: 1
+  }
+
+];
+
+    let shuffled = [];
+    let index = 0;
+
+    function shuffleQuestions() {
+      shuffled = [...questions].sort(() => Math.random() - 0.5);
+      index = 0;
+    }
+
+    function loadQuestion() {
+      if (index >= shuffled.length) shuffleQuestions();
+
+      const q = shuffled[index];
+      document.getElementById("question").textContent = q.q;
+
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, i, q.correct);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(button, selected, correct) {
+      const buttons = document.querySelectorAll(".option");
+
+      buttons.forEach(b => b.disabled = true);
+
+      if (selected === correct) {
+        button.classList.add("correct");
+      } else {
+        button.classList.add("wrong");
+        buttons[correct].classList.add("correct");
+      }
+
+      setTimeout(() => {
+        index++;
+        loadQuestion();
+      }, 900);
+    }
+
+    shuffleQuestions();
+    loadQuestion();
+  </script>
+
+</body>
+</html>
